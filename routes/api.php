@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\BotTelegramController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,4 +17,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+
+Route::group(['prefix' => 'bot'], function () {
+    Route::get('webhook', [BotTelegramController::class, 'setWebhook']);
+    Route::post('webhook', [BotTelegramController::class, 'commandHandlerWebhook']);
+    Route::delete('webhook', [BotTelegramController::class, 'removeWebhook']);
 });

@@ -1,9 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+
 @include('themes.head', ['title' => 'Dashboard'])
+
 <body>
 
 @include('themes.header')
 
 @include('themes.sidebar')
+
 <main id="main" class="main">
 
     <div class="pagetitle">
@@ -655,5 +660,4 @@
 @include('themes.footer')
 
 </body>
-
 </html>
