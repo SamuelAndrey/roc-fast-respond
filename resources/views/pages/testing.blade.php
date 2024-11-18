@@ -658,6 +658,7 @@
 </main><!-- End #main -->
 
 @include('themes.footer')
+@include('themes.vendor')
 
 </body>
 </html>

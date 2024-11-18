@@ -19,6 +19,10 @@ Route::get('/', function () {
     return view('pages.testing');
 });
 
+Route::get('/table', function () {
+    return view('pages.table');
+});
+
 
 /**
  * Group of auth routes.
@@ -40,8 +44,10 @@ Route::group(['prefix' => 'auth'], function () {
 Route::group(['prefix' => 'users'], function () {
     Route::middleware(['auth'])->group(function () {
 
-        Route::get('/profile', [ProfileController::class, 'profilePage'])->name('profile');
-        Route::put('/profile', [ProfileController::class, 'profilePage'])->name('profile.new.password');
+        Route::get('/profile', [ProfileController::class, 'profilePage'])
+            ->name('profile');
+        Route::put('/profile', [ProfileController::class, 'updatePassword'])
+            ->name('profile.new.password');
 
     });
 });

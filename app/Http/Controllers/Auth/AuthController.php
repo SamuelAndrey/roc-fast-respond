@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AuthLoginRequest;
+use App\Http\Requests\Auth\AuthLoginRequest;
 use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
@@ -38,9 +38,7 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
 
-        $remember = false;
-
-        if (isset($validated['remember_me'])) $remember = true;
+        $remember = isset($validated['remember_me']);
 
         $user = User::where('email', '=', $validated['email_or_username'])
             ->orWhere('username',  '=', $validated['email_or_username'])
