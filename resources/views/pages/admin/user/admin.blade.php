@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-@include('themes.head', ['title' => 'Dashboard'])
+@include('themes.head', ['title' => 'Admin'])
 
 <body>
 
@@ -15,7 +15,7 @@
         <h1>User Admin</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
                 <li class="breadcrumb-item">User</li>
                 <li class="breadcrumb-item active">Admin</li>
             </ol>
@@ -28,20 +28,25 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <a href="">
-                            <h5 class="card-title mb-4">Admin <i class="bi bi-person-plus-fill"></i></h5>
-                        </a>
+                        <button type="button" class="btn btn-danger my-4 rounded-2" data-bs-toggle="modal"
+                                data-bs-target="#addModal">
+                            <i class="bi bi-person-plus-fill"></i> Create admin
+                        </button>
 
+                        @include('alerts.error')
+                        @include('alerts.success')
 
-                        <!-- Table with stripped rows -->
-                        <table id="example" class="table table-borderless responsive" style="width:100%">
-                            <thead class="table-secondary">
+                        <!-- Table -->
+                        <table id="user-table" class="table table-borderless responsive table-hover" style="width:100%">
+                            <thead class="table-danger">
                             <tr>
                                 <th>ID</th>
                                 <th>Name</th>
                                 <th>Username</th>
                                 <th>Email</th>
                                 <th>Role</th>
+                                <th>Status</th>
+                                <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -51,14 +56,39 @@
                                     <td>{{ $admin->name }}</td>
                                     <td class="fw-semibold">{{ $admin->username }}</td>
                                     <td>{{ $admin->email }}</td>
-                                    <td class="text-primary fw-semibold">{{ $admin->role }}</td>
+                                    <td class="fw-semibold text-primary">
+                                        {{ $admin->role }}
+                                    </td>
+                                    <td>
+                                        <span class="d-flex align-items-center">
+                                            <span class="rounded-circle me-2" style="width: 10px; height: 10px; background-color: {{ $admin->is_active ? '#28a745' : '#6c757d' }};"></span>
+                                            <span>{{ $admin->is_active ? 'Active' : 'Inactive' }}</span>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="#"
+                                           class="text-reset text-decoration-none me-3 edit-agent"
+                                           data-id="{{ $admin->id }}"
+                                           data-name="{{ $admin->name }}"
+                                           data-username="{{ $admin->username }}"
+                                           data-email="{{ $admin->email }}"
+                                           data-role="{{ $admin->role }}"
+                                           data-is_active="{{ $admin->is_active }}">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </a>
+                                        <a href="#" class="text-reset text-decoration-none delete-agent"
+                                           data-id="{{ $admin->id }}"
+                                           data-name="{{ $admin->name }}">
+                                            <i class="bi bi-trash3-fill"></i>
+                                        </a>
+                                    </td>
+
                                 </tr>
                             @endforeach
 
-
                             </tbody>
                         </table>
-                        <!-- End Table with stripped rows -->
+                        <!-- End Table -->
 
                     </div>
                 </div>
@@ -69,17 +99,13 @@
 
 </main><!-- End #main -->
 
+@include('pages.admin.user.components.modal', ['role' => 'admin'])
+
 @include('themes.footer')
 
 @include('themes.vendor')
 
-<script>
-    $(document).ready(function() {
-        $('#example').DataTable({
-            responsive: true,
-        });
-    });
-</script>
+@include('pages.admin.user.components.script')
 
 </body>
 </html>
