@@ -74,3 +74,19 @@ Route::group(['prefix' => 'users'], function () {
             ->name('user.destroy');
     });
 });
+
+
+// Test Error Page
+
+Route::get('/test-401', function () {
+    abort(401);
+});
+
+
+Route::get('/test-403', function () {
+    abort(403);
+});
+
+Route::get('/test-500', function () {
+    abort(500);
+});

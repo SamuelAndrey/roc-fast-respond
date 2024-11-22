@@ -1,26 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('themes.layout-errors')
 
-@include('themes.head', ['title' => '403 Forbidden'])
-
-<body>
-
-<main>
-    <div class="container">
-
-        <section class="section error-404 min-vh-100 d-flex flex-column align-items-center justify-content-center">
-            <h1 class="text-danger">403</h1>
-            <h2>Forbidden.</h2>
-            <a class="btn bg-danger" href="/">Back to home</a>
-            <img src="{{ asset('assets/img/not-found.svg') }}" class="py-5" alt="Page Not Found">
-        </section>
-
-    </div>
-</main>
-
-<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-@include('themes.vendor')
-
-</body>
-</html>
+@section('title', __('Forbidden'))
+@section('code[0]', '4')
+@section('code[1]', '3')
+@section('code', '403')
+@section('name', 'Forbidden')
+@section('message-core', 'Stop there !!')
+@section('message', ('Sorry, you’re not allowed to access this page. Try logging in with the correct account 
+          or contact support if needed.'))

@@ -1,26 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('themes.layout-errors')
 
-@include('themes.head', ['title' => '500 Server Error'])
-
-<body>
-
-<main>
-    <div class="container">
-
-        <section class="section error-404 min-vh-100 d-flex flex-column align-items-center justify-content-center">
-            <h1 class="text-danger">500</h1>
-            <h2>Server error.</h2>
-            <a class="btn bg-danger" href="/">Back to home</a>
-            <img src="{{ asset('assets/img/not-found.svg') }}" class="py-5" alt="Page Not Found">
-        </section>
-
-    </div>
-</main>
-
-<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-@include('themes.vendor')
-
-</body>
-</html>
+@section('title', __('Server Error'))
+@section('code[0]', '5')
+@section('code[1]', '0')
+@section('code', '500')
+@section('name', 'Internal Server Error')
+@section('message-core', 'Something Wrong..') 
+@section('message', ('We’re sorry, but something went wrong on our side. 
+          Please try again in a few minutes,contact support if the issue persists.'))
