@@ -186,7 +186,7 @@
 
             <li class="nav-item">
                 <a class="nav-link collapsed {{ request()->routeIs('user.agent') || request()->routeIs('user.admin') ? 'show' : '' }}" data-bs-target="#user-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-gem"></i><span>User</span><i class="bi bi-chevron-down ms-auto"></i>
+                    <i class="bi bi-person"></i><span>User</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <ul id="user-nav" class="nav-content collapse {{ request()->routeIs('user.agent') || request()->routeIs('user.admin') ? 'show' : '' }}" data-bs-parent="#sidebar-nav">
                     <li>
