@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-@include('themes.head', ['title' => 'login'])
+@include('themes.head', ['title' => 'Login'])
 
 <body>
 
@@ -29,15 +29,8 @@
                                     <p class="text-center small">Enter your username & password to login</p>
                                 </div>
 
-                                @if ($errors->any())
-                                    <div class="alert alert-danger">
-                                        <ul class="mb-0">
-                                            @foreach ($errors->all() as $error)
-                                                {{ $error }} <br>
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                @endif
+
+                                @include('alerts.error')
 
                                 <form class="row g-3 needs-validation" method="post" action="/auth/login">
                                     @csrf

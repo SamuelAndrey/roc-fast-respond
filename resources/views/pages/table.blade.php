@@ -33,7 +33,7 @@
 
                         <!-- Table with stripped rows -->
                         <table id="example" class="table table-striped responsive" style="width:100%">
-                            <thead class="table-danger">
+                            <thead class="table-secondary">
                             <tr>
                                 <th>
                                     <b>N</b>ame
@@ -765,7 +765,7 @@
 <script>
     $(document).ready(function() {
         $('#example').DataTable({
-            responsive: true
+            responsive: true,
         });
     });
 </script>

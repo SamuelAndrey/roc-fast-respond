@@ -21,8 +21,8 @@ class RoleChecker
             }
         }
 
-        Auth::logout();
+//        Auth::logout();
 
-        return redirect()->route('login')->with('status','You are not authorized to access this page.');
+        return redirect()->route('login')->with('name','You are not authorized to access this page.');
     }
 }

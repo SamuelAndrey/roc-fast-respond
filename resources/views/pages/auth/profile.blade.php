@@ -33,7 +33,7 @@
                             src="https://ui-avatars.com/api/?name={{ auth()->user()->name ?? ""  }}&bold=true&background=0D8ABC&color=fff&size=128"
                             alt="Profile" class="rounded-circle">
                         <h2> {{ auth()->user()->name }} </h2>
-                        <h3> {{ auth()->user()->username }} | <span class="text-primary fw-bold">{{ auth()->user()->role }}</span> </h3>
+                        <h3> {{ auth()->user()->username }} | <span class="text-danger fw-bold">{{ auth()->user()->role }}</span> </h3>
                         <div class="social-links mt-2">
 {{--                            <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>--}}
 {{--                            <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>--}}

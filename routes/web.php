@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -49,5 +50,27 @@ Route::group(['prefix' => 'users'], function () {
         Route::put('/profile', [ProfileController::class, 'updatePassword'])
             ->name('profile.new.password');
 
+    });
+});
+
+/**
+ * Group of admin routes
+ */
+Route::group(['prefix' => 'users'], function () {
+    Route::middleware(['auth', 'role:admin'])->group(function () {
+
+        Route::get('/agent', [UserController::class, 'listAgentPage'])
+            ->name('user.agent');
+        Route::get('/admin', [UserController::class, 'listAdminPage'])
+            ->name('user.admin');
+
+        Route::post('/', [UserController::class, 'store'])
+            ->name('user.store');
+
+        Route::put('/{userId}', [UserController::class, 'update'])
+            ->name('user.update');
+
+        Route::delete('/{userId}', [UserController::class, 'destroy'])
+            ->name('user.destroy');
     });
 });

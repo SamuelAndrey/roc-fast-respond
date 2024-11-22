@@ -36,21 +36,31 @@ class BotTelegramController extends Controller
     public function commandHandlerWebhook(): Message
     {
         $updates = Telegram::commandsHandler(true);
-        $chat_id = $updates->getChat()->getId();
-        $username = $updates->getChat()->getFirstName();
+
+        $chatId = $updates->getChat()->getId();
+
+        $firstName = $updates->getChat()->getFirstName();
+        $lastName = $updates->getChat()->getLastName();
+        $userName = $updates->getMessage()->from->username;
+        $userId = $updates->getMessage()->from->id;
+
         $message = $updates->getMessage()->getText();
 
         error_log($message);
 
         if (strtolower($message) == 'halo') {
             return Telegram::sendMessage([
-                'chat_id' => $chat_id,
-                'text' => 'Halo ' . $username,
+                'chat_id' => $chatId,
+                'text' => 'Halo ' . $userName,
             ]);
         } else {
+            // Convert updates object to pretty JSON
+            $prettyResponse = json_encode( $updates, JSON_PRETTY_PRINT);
+
             return Telegram::sendMessage([
-                'chat_id' => $chat_id,
-                'text' => $message,
+                'chat_id' => $chatId,
+                'text' => "Berikut adalah data:\n\n" . "```json\n" . $prettyResponse . "\n```",
+                'parse_mode' => 'Markdown'
             ]);
         }
     }
