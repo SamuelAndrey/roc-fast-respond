@@ -29,8 +29,7 @@
                 <div class="card">
                     <div class="card-body">
                         <button type="button" class="btn btn-danger my-4 rounded-2" data-bs-toggle="modal"
-                                data-bs-target="#addModal">
-                            <i class="bi bi-person-plus-fill"></i> Create agent
+                                data-bs-target="#addModal">Create agent
                         </button>
 
                         @include('alerts.error')
@@ -38,7 +37,7 @@
 
                         <!-- Table -->
                         <table id="user-table" class="table table-borderless responsive table-hover" style="width:100%">
-                            <thead class="table-danger">
+                            <thead class="table-secondary">
                             <tr>
                                 <th>ID</th>
                                 <th>Name</th>
