@@ -5,6 +5,6 @@
 @section('code[1]', '1')
 @section('code', '401')
 @section('name', 'Unauthorized')
-@section('message-core', 'Access denied!') 
+@section('message-core', 'Access Denied!') 
 @section('message', ('You need valid authentication to access this page.
           If you believe this is a mistake, please contact the administrator'))

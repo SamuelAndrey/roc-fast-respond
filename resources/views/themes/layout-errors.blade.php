@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://unpkg.com/bs-brain@2.0.4/components/error-404s/error-404-1/assets/css/error-404-1.css">
     
+    
 
     <!-- Favicons -->
     <link href="{{ asset('assets/img/favicon/favicon.png') }}" rel="icon">
@@ -17,6 +18,27 @@
     <!-- Script Animations Error -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.10.2/lottie.min.js"></script>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Poppins:wght@300&display=swap" rel="stylesheet">
+
+  
+    <!-- Template Main CSS File -->
+    <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
+    
+    <style>
+        body {
+          background-color: #f5e9e9;
+        }
+        .error-message{
+          font-family: "Poppins" , serif;
+          font-optical-sizing: auto;
+          font-weight: 100;
+          font-style: normal;
+          font-variation-settings: "wdth" 100;
+        }
+        
+    </style>
 
 </head>
 <body>
@@ -42,12 +64,14 @@
                     path: '/animations/settings-error.json' // Path ke file JSON
                 });
             </script>
-            
-
-            <h3 class="h2 mb-2">@yield('message-core')</h3>
-            <p class="mb-2">@yield('message')</p>
-            <p class="mb-4 fst-italic fw-bold ">Error : @yield('name')</p>
-            <a class="btn bsb-btn-5xl btn-danger rounded-pill px-5 fs-6 m-0" href="/" role="button">Back to Home</a>
+            <div class="error-message">
+                <h2 class="mb-3">@yield('message-core')</h2>
+                <p class="h5 mb-3">@yield('message')</p>
+                <div class="bg-dark rounded width-auto  ">
+                  <p class="h5 mb-4 text-danger fw-bold ">Error : @yield('name')</p>
+                </div>
+                <a class="btn bsb-btn-5xl btn-danger rounded-pill px-5 fs-6 m-0" href="/" role="button">Back to Home</a>
+            </div>
           </div>
         </div>
       </div>
