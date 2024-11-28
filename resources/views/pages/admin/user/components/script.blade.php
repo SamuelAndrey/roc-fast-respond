@@ -2,14 +2,13 @@
 <script src="{{ asset('assets/vendor/datatables/datatables.js') }}"></script>
 <script src="{{ asset('assets/js/main.js') }}"></script>
 
-
-
 <script>
     $(document).ready(function () {
         const baseUrl = @json(url('/users'));
 
         $('#user-table').DataTable({
             responsive: true,
+            ordering: false
         });
 
         // Edit agent modal
