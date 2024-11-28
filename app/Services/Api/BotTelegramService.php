@@ -99,26 +99,46 @@ class BotTelegramService
 
     public function processData($chatId, $messageId, $command, $action, $data, $approvalData, $rawData): void
     {
+        $requester_identity = [
+            'nama' => $data['nama_'] ?? '(Kosong)',
+            'nik' => $data['nik_'] ?? '(Kosong)',
+            'unit' => $data['unit_'] ?? '(Kosong)',
+        ];
 
+        $ticket = $data['perihal_'] ?? '(Kosong)';
+        $reason = $data['alasan_'] ?? '(Kosong)';
+
+        $approval_identity = [
+            'nama_atasan' => $approvalData['nama_atasan_'] ?? '(Kosong)',
+            'nik_atasan' => $approvalData['nik_atasan_'] ?? '(Kosong)',
+        ];
+
+        // Debugging data hasil parsing
+        error_log("Requester Identity: " . print_r($requester_identity, true));
+        error_log("Ticket: " . $ticket);
+        error_log("Reason: " . $reason);
+        error_log("Approval Identity: " . print_r($approval_identity, true));
+
+        // Susun pesan balasan
         $replyMessage = "Command: $command\n";
         $replyMessage .= "Action: $action\n";
-        $replyMessage .= "Data yang diproses:\n";
-
-        foreach ($data as $key => $value) {
-            $replyMessage .= ucfirst(str_replace('_', ' ', $key)) . ": " . trim($value) . "\n";
+        $replyMessage .= "Requester Identity:\n";
+        foreach ($requester_identity as $key => $value) {
+            $replyMessage .= ucfirst(str_replace('_', ' ', $key)) . ": " . $value . "\n";
         }
 
-        $replyMessage .= "\nApproval Data:\n";
-        foreach ($approvalData as $key => $value) {
-            $replyMessage .= ucfirst(str_replace('_', ' ', $key)) . ": " . trim($value) . "\n";
+        $replyMessage .= "\nTicket: " . $ticket . "\n";
+        $replyMessage .= "Reason: " . $reason . "\n";
+
+        $replyMessage .= "\nApproval Identity:\n";
+        foreach ($approval_identity as $key => $value) {
+            $replyMessage .= ucfirst(str_replace('_', ' ', $key)) . ": " . $value . "\n";
         }
 
-        $replyMessage .= "\nRaw Data (antara tanda #):\n";
-        $replyMessage .= !empty($rawData) ? $rawData : "(Kosong)";
+        $replyMessage .= "\nRaw Data (antara tanda #):\n" . $rawData;
 
         $this->replyMessage($chatId, $messageId, $replyMessage);
     }
-
     public function replyMessage($chatId, $messageId, $replyMessage)
     {
         try {
