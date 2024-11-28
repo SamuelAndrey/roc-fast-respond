@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-@include('themes.head', ['title' => 'Agent'])
+@include('pages.admin.user.components.head', ['title' => 'Agent'])
 
 <body>
 
@@ -28,7 +28,7 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <button type="button" class="btn btn-danger my-4 rounded-2" data-bs-toggle="modal"
+                        <button type="button" class="btn btn-danger btn-sm my-4" data-bs-toggle="modal"
                                 data-bs-target="#addModal">Create agent
                         </button>
 
@@ -53,9 +53,9 @@
                                 <tr>
                                     <td class="text-primary">#{{ $agent->id }}</td>
                                     <td>{{ $agent->name }}</td>
-                                    <td class="fw-semibold">{{ $agent->username }}</td>
+                                    <td class="fw-medium">{{ $agent->username }}</td>
                                     <td>{{ $agent->email }}</td>
-                                    <td class="fw-semibold text-primary">
+                                    <td class="fw-medium text-primary">
                                         {{ $agent->role }}
                                     </td>
                                     <td>
@@ -101,8 +101,6 @@
 @include('pages.admin.user.components.modal', ['role' => 'agent'])
 
 @include('themes.footer')
-
-@include('themes.vendor')
 
 @include('pages.admin.user.components.script')
 

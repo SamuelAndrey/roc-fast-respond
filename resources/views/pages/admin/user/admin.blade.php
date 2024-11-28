@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-@include('themes.head', ['title' => 'Admin'])
+@include('pages.admin.user.components.head', ['title' => 'Agent'])
 
 <body>
 
@@ -28,7 +28,7 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <button type="button" class="btn btn-danger my-4 rounded-2" data-bs-toggle="modal"
+                        <button type="button" class="btn btn-danger btn-sm my-4" data-bs-toggle="modal"
                                 data-bs-target="#addModal">Create admin
                         </button>
 
@@ -53,9 +53,9 @@
                                 <tr>
                                     <td class="text-primary">#{{ $admin->id }}</td>
                                     <td>{{ $admin->name }}</td>
-                                    <td class="fw-semibold">{{ $admin->username }}</td>
+                                    <td class="fw-medium">{{ $admin->username }}</td>
                                     <td>{{ $admin->email }}</td>
-                                    <td class="fw-semibold text-primary">
+                                    <td class="fw-medium text-primary">
                                         {{ $admin->role }}
                                     </td>
                                     <td>
@@ -101,8 +101,6 @@
 @include('pages.admin.user.components.modal', ['role' => 'admin'])
 
 @include('themes.footer')
-
-@include('themes.vendor')
 
 @include('pages.admin.user.components.script')
 

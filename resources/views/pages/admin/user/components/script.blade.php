@@ -1,3 +1,9 @@
+<script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('assets/vendor/datatables/datatables.js') }}"></script>
+<script src="{{ asset('assets/js/main.js') }}"></script>
+
+
+
 <script>
     $(document).ready(function () {
         const baseUrl = @json(url('/users'));
