@@ -2,6 +2,7 @@
 
 namespace App\Services\Api;
 
+use App\KeyPrompt;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Telegram\Bot\Objects\Message;
 
@@ -36,9 +37,16 @@ class BotTelegramService
             return;
         }
 
-        // Ambil command dan action, bersihkan simbol '#' berlebih
         [$command, $action] = explode('#', $lines[0], 2);
-        $action = rtrim($action, '#'); // Hapus simbol '#' di akhir action
+        $action = rtrim($action, '#');
+
+
+        if (!KeyPrompt::validate($action)['status']) {
+            $replyMessage = "Mohon maaf, perintah anda tidak terdaftar sebagai unbind atau closing.";
+            $this->replyMessage($chatId, $messageId, $replyMessage);
+
+            return;
+        }
 
         $data = [];
         $approvalData = [];
@@ -59,7 +67,7 @@ class BotTelegramService
             }
 
             // Mulai menangkap raw data setelah close_inet#
-            if (!$isCapturingRaw && str_contains($line, 'close_inet#')) {
+            if (!$isCapturingRaw && str_contains($line, $action . '#')) {
                 $isCapturingRaw = true;
                 continue; // Jangan proses baris ini
             }
@@ -99,7 +107,6 @@ class BotTelegramService
 
     public function processData($chatId, $messageId, $command, $action, $data, $approvalData, $rawData): void
     {
-
         $ticket = $data['perihal'] ?? '(Kosong)';
         $reason = $data['alasan'] ?? '(Kosong)';
         $nama = $data['nama'] ?? '(Kosong)';
@@ -108,7 +115,6 @@ class BotTelegramService
 
         $namaAtasan = $approvalData['nama_atasan'] ?? '(Kosong)';
         $nikAtasan = $approvalData['nik_atasan'] ?? '(Kosong)';
-
 
         $requesterIdentity = <<<IDENTITY
             Nama: $nama
@@ -121,26 +127,14 @@ class BotTelegramService
             NIK Atasan: $nikAtasan
             IDENTITY;
 
-        // Debugging data hasil parsing
-        error_log("Requester Identity: " . print_r($requesterIdentity, true));
-        error_log("Ticket: " . $ticket);
-        error_log("Reason: " . $reason);
-        error_log("Approval Identity: " . print_r($approvalIdentity, true));
-
-        // Susun pesan balasan
         $replyMessage = "Command: $command\n";
         $replyMessage .= "Action: $action\n";
         $replyMessage .= "Requester Identity:\n";
-
         $replyMessage .= $requesterIdentity . "\n";
-
         $replyMessage .= "\nTicket: " . $ticket . "\n";
         $replyMessage .= "Reason: " . $reason . "\n";
-
         $replyMessage .= "\nApproval Identity:\n";
-
         $replyMessage .= $approvalIdentity . "\n";
-
         $replyMessage .= "\nRaw Data (antara tanda #):\n" . $rawData;
 
         $this->replyMessage($chatId, $messageId, $replyMessage);
