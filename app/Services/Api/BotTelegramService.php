@@ -48,14 +48,27 @@ class BotTelegramService
         [$command, $action] = explode('#', $lines[0], 2);
         $action = rtrim($action, '#');
 
-        if (!KeyPrompt::validate($action)['status']) {
+        $actionCategory = KeyPrompt::validate($action);
+
+        if (!$actionCategory['status']) {
             $this->sendReply($chatId, $messageId, "Mohon maaf, perintah anda tidak terdaftar sebagai unbind atau closing.");
             return;
         }
 
         [$data, $approvalData, $rawData] = $this->parseMessageLines($lines, $action);
 
-        $this->processPromptData($chatId, $messageId, $action, $data, $approvalData, $rawData, $chatTitle);
+        $processParams = [
+            'chat_id' => $chatId,
+            'message_id' => $messageId,
+            'action' => $action,
+            'data' => $data,
+            'approval_data' => $approvalData,
+            'raw_data' => $rawData,
+            'chat_title' => $chatTitle,
+            'action_category' => $actionCategory['type']
+        ];
+
+        $this->processPromptData($processParams);
     }
 
 
@@ -119,35 +132,32 @@ class BotTelegramService
     /**
      * @throws Exception
      */
-    private function processPromptData($chatId, $messageId, $action, $data, $approvalData, $rawData, $chatTitle): void
+    private function processPromptData($params): void
     {
-        $replyMessage = $this->processToDatabase($chatId, $messageId, $action, $data, $approvalData, $rawData, $chatTitle);
-        $this->sendReply($chatId, $messageId, $replyMessage);
+        $replyMessage = $this->processToDatabase($params);
+        $this->sendReply($params['chat_id'], $params['message_id'], $replyMessage);
     }
 
 
     /**
-     * @param $chatId
-     * @param $messageId
-     * @param $action
-     * @param $data
-     * @param $approvalData
-     * @param $rawData
-     * @param $chatTitle
+     * @param $params
      * @return string
      * @throws Exception
      */
-    private function processToDatabase($chatId, $messageId, $action, $data, $approvalData, $rawData, $chatTitle): string
+    private function processToDatabase($params): string
     {
 
-        $data = $this->generateRequest($chatId, $messageId, $action, $data, $approvalData, $rawData, $chatTitle);
+        $data = $this->generateRequest($params);
+        $actionCategory = $params['action_category'];
 
         try {
             $closing = Closing::query()->create($data);
             return <<<RESP
                     Permintaan closing berhasil di proses.
 
-                    Nomor Tiket Anda: $closing->ticket_id
+                    ~ Tercatat ~
+                    Kategori $actionCategory
+                    No.Tiket $closing->ticket_id
 
                     RESP;
         } catch (Exception $e) {
@@ -155,36 +165,33 @@ class BotTelegramService
         }
     }
 
-    public function generateRequest($chatId, $messageId, $action, $data, $approvalData, $rawData, $chatTitle): array
+    public function generateRequest($params): array
     {
         $requester = $this->generateIdentity([
-            'Nama' => $data['nama'] ?? '(Kosong)',
-            'NIK' => $data['nik'] ?? '(Kosong)',
-            'Unit' => $data['unit'] ?? '(Kosong)'
+            'Nama' => $params['data']['nama'] ?? '(Kosong)',
+            'NIK' => $params['data']['nik'] ?? '(Kosong)',
+            'Unit' => $params['data']['unit'] ?? '(Kosong)'
         ]);
 
         $approval = $this->generateIdentity([
-            'Nama Atasan' => $approvalData['nama_atasan'] ?? '(Kosong)',
-            'NIK Atasan' => $approvalData['nik_atasan'] ?? '(Kosong)'
+            'Nama Atasan' => $params['approval_data']['nama_atasan'] ?? '(Kosong)',
+            'NIK Atasan' => $params['approval_data']['nik_atasan'] ?? '(Kosong)'
         ]);
 
-        $ticket = $data['perihal'] ?? '(Kosong)';
-        $reason = $data['alasan'] ?? '(Kosong)';
-        error_log($approval);
-        error_log($rawData);
+        $ticket = $params['data']['perihal'] ?? '(Kosong)';
+        $reason = $params['data']['alasan'] ?? '(Kosong)';
 
         return [
-            'chat_id' => $chatId,
-            'message_id' => $messageId,
+            'chat_id' => $params['chat_id'],
+            'message_id' => $params['message_id'],
             'requester_identity' => $requester,
             'approval_identity' => $approval,
             'ticket' => $ticket,
             'reason' => $reason,
             'witel' => $data['unit'] ?? '(Kosong)',
-            'message' => $rawData,
-            'category' => $action,
-            'group_name' => $chatTitle,
-
+            'message' => $params['raw_data'],
+            'category' => $params['action'],
+            'group_name' => $params['chat_title'],
         ];
     }
 
