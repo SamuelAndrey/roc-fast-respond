@@ -2,9 +2,9 @@
 
 namespace App\Services\Api;
 
-use App\KeyPrompt;
+use App\Helpers\KeyPrompt;
+use App\Helpers\SupportCommand;
 use Telegram\Bot\Laravel\Facades\Telegram;
-use Telegram\Bot\Objects\Message;
 
 class BotTelegramService
 {
@@ -19,14 +19,11 @@ class BotTelegramService
                 $this->handlePrompt($chatId, $messageId, $message);
                 break;
 
-            case str_starts_with($message, '/help'):
-                $this->sendReply($chatId, $messageId, "Daftar command yang tersedia:\n/moban#close_inet - Tangani tiket penutupan.");
-                break;
-
             default:
-                $this->sendReply($chatId, $messageId, "Command tidak dikenali. Gunakan /help untuk melihat command yang tersedia.");
+                $this->handleCommand($chatId, $messageId, $message);
         }
     }
+
 
     private function handlePrompt($chatId, $messageId, $message): void
     {
@@ -47,6 +44,7 @@ class BotTelegramService
 
         $this->processPromptData($chatId, $messageId, $command, $action, $data, $approvalData, $rawData);
     }
+
 
     private function parseMessageLines(array $lines, string $action): array
     {
@@ -86,6 +84,7 @@ class BotTelegramService
         return [$data, $approvalData, $rawData];
     }
 
+
     private function parseKeyValuePair(string $line, array &$data, array &$approvalData, bool $isApprovalSection, ?string &$currentKey): void
     {
         if (str_contains($line, '=')) {
@@ -103,11 +102,13 @@ class BotTelegramService
         }
     }
 
+
     private function processPromptData($chatId, $messageId, $command, $action, $data, $approvalData, $rawData): void
     {
         $replyMessage = $this->generateReplyMessage($command, $action, $data, $approvalData, $rawData);
         $this->sendReply($chatId, $messageId, $replyMessage);
     }
+
 
     private function generateReplyMessage(string $command, string $action, array $data, array $approvalData, string $rawData): string
     {
@@ -143,10 +144,12 @@ class BotTelegramService
             REPLY;
     }
 
+
     private function generateIdentity(array $fields): string
     {
         return implode("\n", array_map(fn($key, $value) => "$key: $value", array_keys($fields), $fields));
     }
+
 
     private function sendReply($chatId, $messageId, $text): void
     {
@@ -158,8 +161,23 @@ class BotTelegramService
         ]);
     }
 
+
     private function formatKey(string $key): string
     {
         return strtolower(preg_replace('/\s+/', '_', trim($key)));
+    }
+
+
+    private function handleCommand($chatId, $messageId, $message): void
+    {
+        $commands = SupportCommand::SUPPORT_MESSAGE;
+        foreach ($commands as $command => $replyText) {
+            if (str_starts_with($message, $command)) {
+                $this->sendReply($chatId, $messageId, $replyText);
+                return;
+            }
+        }
+
+        $this->sendReply($chatId, $messageId, "Command tidak dikenali. Gunakan /help untuk melihat command yang tersedia.");
     }
 }
