@@ -17,7 +17,9 @@ class Closing extends Model
         'ticket_id',
         'group_name',
         'requester_identity',
+        'approval_identity',
         'category',
+        'message',
         'ticket',
         'witel',
         'reason',
@@ -28,6 +30,8 @@ class Closing extends Model
         'created_at',
         'updated_at',
         'solved_at',
+        'chat_id',
+        'message_id',
     ];
 
     protected static function boot(): void

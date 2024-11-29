@@ -14,13 +14,16 @@ return new class extends Migration
         Schema::create('closings', function (Blueprint $table) {
             $table->id();
             $table->string('ticket_id')->unique()->nullable();
-            $table->string('group_name')->nullable(false);
-            $table->text('requester_identity')->nullable(false);
-            $table->text('approval_identity')->nullable(false);
-            $table->string('category')->nullable(false);
-            $table->string('ticket')->nullable(false);
-            $table->string('witel')->nullable(false);
-            $table->string('reason')->nullable(false);
+            $table->bigInteger('chat_id')->nullable();
+            $table->bigInteger('message_id')->nullable();
+            $table->string('group_name')->nullable();
+            $table->text('requester_identity')->nullable();
+            $table->text('approval_identity')->nullable();
+            $table->text('message')->nullable();
+            $table->string('category')->nullable();
+            $table->string('ticket')->nullable();
+            $table->string('witel')->nullable();
+            $table->string('reason')->nullable();
             $table->tinyInteger('status')->nullable(false)->default(0);
             $table->string('solver')->nullable();
             $table->text('action')->nullable();
