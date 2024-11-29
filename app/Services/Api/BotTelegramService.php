@@ -79,7 +79,7 @@ class BotTelegramService
             // Parsing data utama meskipun sedang menangkap raw data
             if (!$isApprovalSection && str_contains($line, '=')) {
                 [$key, $value] = explode('=', $line, 2);
-                $currentKey = trim(strtolower(str_replace(' ', '_', $key))); // Normalisasi key
+                $currentKey = $this->formatKeyValue($key);
                 $data[$currentKey] = trim($value); // Simpan ke data utama
             } elseif (!$isApprovalSection && $currentKey) {
                 // Jika tidak ada '=' dan ada key yang sedang diproses, tambahkan ke nilai key
@@ -89,7 +89,7 @@ class BotTelegramService
             // Parsing data #approval
             if ($isApprovalSection && str_contains($line, '=')) {
                 [$key, $value] = explode('=', $line, 2);
-                $key = trim(strtolower(str_replace(' ', '_', $key))); // Normalisasi key
+                $key = $this->formatKeyValue($key);
                 $approvalData[$key] = trim($value);
             }
         }
@@ -100,17 +100,17 @@ class BotTelegramService
     public function processData($chatId, $messageId, $command, $action, $data, $approvalData, $rawData): void
     {
         $requester_identity = [
-            'nama' => $data['nama_'] ?? '(Kosong)',
-            'nik' => $data['nik_'] ?? '(Kosong)',
-            'unit' => $data['unit_'] ?? '(Kosong)',
+            'nama' => $data['nama'] ?? '(Kosong)',
+            'nik' => $data['nik'] ?? '(Kosong)',
+            'unit' => $data['unit'] ?? '(Kosong)',
         ];
 
-        $ticket = $data['perihal_'] ?? '(Kosong)';
-        $reason = $data['alasan_'] ?? '(Kosong)';
+        $ticket = $data['perihal'] ?? '(Kosong)';
+        $reason = $data['alasan'] ?? '(Kosong)';
 
         $approval_identity = [
-            'nama_atasan' => $approvalData['nama_atasan_'] ?? '(Kosong)',
-            'nik_atasan' => $approvalData['nik_atasan_'] ?? '(Kosong)',
+            'nama_atasan' => $approvalData['nama_atasan'] ?? '(Kosong)',
+            'nik_atasan' => $approvalData['nik_atasan'] ?? '(Kosong)',
         ];
 
         // Debugging data hasil parsing
@@ -151,6 +151,15 @@ class BotTelegramService
         } catch (\Exception $e) {
             error_log("Telegram API Error: " . $e->getMessage());
         }
+    }
+
+    public function formatKeyValue($key): string
+    {
+        $key = preg_replace('/^\s+|\s+$|\s+(?=\s)/', '', $key);
+
+        $key = str_replace(' ', '_', $key);
+
+        return strtolower($key);
     }
 
 }
