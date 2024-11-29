@@ -99,47 +99,61 @@ class BotTelegramService
 
     public function processData($chatId, $messageId, $command, $action, $data, $approvalData, $rawData): void
     {
-        $requester_identity = [
-            'nama' => $data['nama'] ?? '(Kosong)',
-            'nik' => $data['nik'] ?? '(Kosong)',
-            'unit' => $data['unit'] ?? '(Kosong)',
-        ];
 
         $ticket = $data['perihal'] ?? '(Kosong)';
         $reason = $data['alasan'] ?? '(Kosong)';
+        $nama = $data['nama'] ?? '(Kosong)';
+        $nik = $data['nik'] ?? '(Kosong)';
+        $unit = $data['unit'] ?? '(Kosong)';
 
-        $approval_identity = [
-            'nama_atasan' => $approvalData['nama_atasan'] ?? '(Kosong)',
-            'nik_atasan' => $approvalData['nik_atasan'] ?? '(Kosong)',
-        ];
+        $namaAtasan = $approvalData['nama_atasan'] ?? '(Kosong)';
+        $nikAtasan = $approvalData['nik_atasan'] ?? '(Kosong)';
+
+
+        $requesterIdentity = <<<IDENTITY
+            Nama: $nama
+            NIK: $nik
+            Unit: $unit
+            IDENTITY;
+
+        $approvalIdentity = <<<IDENTITY
+            Nama Atasan: $namaAtasan
+            NIK Atasan: $nikAtasan
+            IDENTITY;
 
         // Debugging data hasil parsing
-        error_log("Requester Identity: " . print_r($requester_identity, true));
+        error_log("Requester Identity: " . print_r($requesterIdentity, true));
         error_log("Ticket: " . $ticket);
         error_log("Reason: " . $reason);
-        error_log("Approval Identity: " . print_r($approval_identity, true));
+        error_log("Approval Identity: " . print_r($approvalIdentity, true));
 
         // Susun pesan balasan
         $replyMessage = "Command: $command\n";
         $replyMessage .= "Action: $action\n";
         $replyMessage .= "Requester Identity:\n";
-        foreach ($requester_identity as $key => $value) {
-            $replyMessage .= ucfirst(str_replace('_', ' ', $key)) . ": " . $value . "\n";
-        }
+
+        $replyMessage .= $requesterIdentity . "\n";
 
         $replyMessage .= "\nTicket: " . $ticket . "\n";
         $replyMessage .= "Reason: " . $reason . "\n";
 
         $replyMessage .= "\nApproval Identity:\n";
-        foreach ($approval_identity as $key => $value) {
-            $replyMessage .= ucfirst(str_replace('_', ' ', $key)) . ": " . $value . "\n";
-        }
+
+        $replyMessage .= $approvalIdentity . "\n";
 
         $replyMessage .= "\nRaw Data (antara tanda #):\n" . $rawData;
 
         $this->replyMessage($chatId, $messageId, $replyMessage);
     }
-    public function replyMessage($chatId, $messageId, $replyMessage)
+
+
+    /**
+     * @param $chatId
+     * @param $messageId
+     * @param $replyMessage
+     * @return Message
+     */
+    public function replyMessage($chatId, $messageId, $replyMessage): Message
     {
         try {
             return Telegram::sendMessage([
@@ -149,10 +163,20 @@ class BotTelegramService
                 'parse_mode' => 'HTML',
             ]);
         } catch (\Exception $e) {
-            error_log("Telegram API Error: " . $e->getMessage());
+            return Telegram::sendMessage([
+                'chat_id' => $chatId,
+                'text' => $e->getMessage(),
+                'reply_to_message_id' => $messageId,
+                'parse_mode' => 'HTML',
+            ]);
         }
     }
 
+
+    /**
+     * @param $key
+     * @return string
+     */
     public function formatKeyValue($key): string
     {
         $key = preg_replace('/^\s+|\s+$|\s+(?=\s)/', '', $key);
