@@ -46,43 +46,8 @@ class BotTelegramController extends Controller
 
     public function commandHandlerWebhook(): void
     {
+        # $prettyResponse = json_encode($updates, JSON_PRETTY_PRINT);
         $updates = Telegram::commandsHandler(true);
         $this->botTelegramService->commandHandler($updates);
     }
-
-
-//    public function commandHandlerWebhook(): Message
-//    {
-//        $updates = Telegram::commandsHandler(true);
-//
-//        $chatId = $updates->getChat()->getId();
-//
-//        $firstName = $updates->getChat()->getFirstName();
-//        $lastName = $updates->getChat()->getLastName();
-//        $userName = $updates->getMessage()->from->username;
-//        $userId = $updates->getMessage()->from->id;
-//        $messageId = $updates->getMessage()->getMessageId();
-//
-//        $message = $updates->getMessage()->getText();
-//
-//        error_log($message);
-//
-//        if (strtolower($message) == 'halo') {
-//            return Telegram::sendMessage([
-//                'chat_id' => $chatId,
-//                'text' => 'Halo ' . $userName,
-//                'reply_to_message_id' => $messageId,
-//            ]);
-//        } else {
-//            // Convert updates object to pretty JSON
-//            $prettyResponse = json_encode($updates, JSON_PRETTY_PRINT);
-//
-//            return Telegram::sendMessage([
-//                'chat_id' => $chatId,
-//                'text' => "Berikut adalah data:\n\n" . "```json\n" . CUID::closing() . "\n```",
-//                'parse_mode' => 'Markdown',
-//                'reply_to_message_id' => $messageId,
-//            ]);
-//        }
-//    }
 }

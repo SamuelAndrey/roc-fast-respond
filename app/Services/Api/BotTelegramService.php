@@ -8,31 +8,29 @@ use Telegram\Bot\Objects\Message;
 
 class BotTelegramService
 {
-
     public function commandHandler($updates): void
     {
         $chatId = $updates->getChat()->getId();
-        $firstName = $updates->getChat()->getFirstName();
-        $lastName = $updates->getChat()->getLastName();
-        $userName = $updates->getMessage()->from->username;
-        $userId = $updates->getMessage()->from->id;
-        $message = $updates->getMessage()->getText();
         $messageId = $updates->getMessage()->getMessageId();
+        $message = $updates->getMessage()->getText();
 
-        if (str_starts_with($message, '/moban')) {
-            $this->promptHandler($chatId, $messageId, $message);
-        } elseif (str_starts_with($message, '/help')) {
-            $this->replyMessage($chatId, $messageId, "Daftar command yang tersedia:\n/moban#close_inet - Tangani tiket penutupan.");
-        } else {
-            $this->replyMessage($chatId, $messageId, "Command tidak dikenali. Gunakan /help untuk melihat command yang tersedia.");
+        switch (true) {
+            case str_starts_with($message, '/moban'):
+                $this->handlePrompt($chatId, $messageId, $message);
+                break;
+
+            case str_starts_with($message, '/help'):
+                $this->sendReply($chatId, $messageId, "Daftar command yang tersedia:\n/moban#close_inet - Tangani tiket penutupan.");
+                break;
+
+            default:
+                $this->sendReply($chatId, $messageId, "Command tidak dikenali. Gunakan /help untuk melihat command yang tersedia.");
         }
-
     }
 
-    public function promptHandler($chatId, $messageId, $message): void
+    private function handlePrompt($chatId, $messageId, $message): void
     {
         $lines = explode("\n", trim($message));
-
         if (!str_starts_with($lines[0], '/moban')) {
             return;
         }
@@ -40,14 +38,18 @@ class BotTelegramService
         [$command, $action] = explode('#', $lines[0], 2);
         $action = rtrim($action, '#');
 
-
         if (!KeyPrompt::validate($action)['status']) {
-            $replyMessage = "Mohon maaf, perintah anda tidak terdaftar sebagai unbind atau closing.";
-            $this->replyMessage($chatId, $messageId, $replyMessage);
-
+            $this->sendReply($chatId, $messageId, "Mohon maaf, perintah anda tidak terdaftar sebagai unbind atau closing.");
             return;
         }
 
+        [$data, $approvalData, $rawData] = $this->parseMessageLines($lines, $action);
+
+        $this->processPromptData($chatId, $messageId, $command, $action, $data, $approvalData, $rawData);
+    }
+
+    private function parseMessageLines(array $lines, string $action): array
+    {
         $data = [];
         $approvalData = [];
         $rawData = '';
@@ -58,127 +60,106 @@ class BotTelegramService
         foreach ($lines as $line) {
             $line = trim($line);
 
-            // Abaikan baris kosong
             if (empty($line)) {
-                if ($isCapturingRaw) {
-                    $rawData .= "\n"; // Tambahkan baris kosong ke raw data
-                }
+                $rawData .= $isCapturingRaw ? "\n" : '';
                 continue;
             }
 
-            // Mulai menangkap raw data setelah close_inet#
             if (!$isCapturingRaw && str_contains($line, $action . '#')) {
                 $isCapturingRaw = true;
-                continue; // Jangan proses baris ini
-            }
-
-            // Berhenti menangkap raw data setelah #approval
-            if (str_contains($line, '#approval')) {
-                $isCapturingRaw = false;
-                $isApprovalSection = true; // Mulai bagian #approval
                 continue;
             }
 
-            // Tangkap raw data jika sedang dalam mode capturing
+            if (str_contains($line, '#approval')) {
+                $isCapturingRaw = false;
+                $isApprovalSection = true;
+                continue;
+            }
+
             if ($isCapturingRaw) {
                 $rawData .= $line . "\n";
             }
 
-            // Parsing data utama meskipun sedang menangkap raw data
-            if (!$isApprovalSection && str_contains($line, '=')) {
-                [$key, $value] = explode('=', $line, 2);
-                $currentKey = $this->formatKeyValue($key);
-                $data[$currentKey] = trim($value); // Simpan ke data utama
-            } elseif (!$isApprovalSection && $currentKey) {
-                // Jika tidak ada '=' dan ada key yang sedang diproses, tambahkan ke nilai key
-                $data[$currentKey] .= "\n" . $line;
-            }
-
-            // Parsing data #approval
-            if ($isApprovalSection && str_contains($line, '=')) {
-                [$key, $value] = explode('=', $line, 2);
-                $key = $this->formatKeyValue($key);
-                $approvalData[$key] = trim($value);
-            }
+            $this->parseKeyValuePair($line, $data, $approvalData, $isApprovalSection, $currentKey);
         }
 
-        $this->processData($chatId, $messageId, $command, $action, $data, $approvalData, $rawData);
+        return [$data, $approvalData, $rawData];
     }
 
-    public function processData($chatId, $messageId, $command, $action, $data, $approvalData, $rawData): void
+    private function parseKeyValuePair(string $line, array &$data, array &$approvalData, bool $isApprovalSection, ?string &$currentKey): void
     {
+        if (str_contains($line, '=')) {
+            [$key, $value] = explode('=', $line, 2);
+            $formattedKey = $this->formatKey($key);
+
+            if ($isApprovalSection) {
+                $approvalData[$formattedKey] = trim($value);
+            } else {
+                $data[$formattedKey] = trim($value);
+                $currentKey = $formattedKey;
+            }
+        } elseif ($currentKey && !$isApprovalSection) {
+            $data[$currentKey] .= "\n" . $line;
+        }
+    }
+
+    private function processPromptData($chatId, $messageId, $command, $action, $data, $approvalData, $rawData): void
+    {
+        $replyMessage = $this->generateReplyMessage($command, $action, $data, $approvalData, $rawData);
+        $this->sendReply($chatId, $messageId, $replyMessage);
+    }
+
+    private function generateReplyMessage(string $command, string $action, array $data, array $approvalData, string $rawData): string
+    {
+        $requester = $this->generateIdentity([
+            'Nama' => $data['nama'] ?? '(Kosong)',
+            'NIK' => $data['nik'] ?? '(Kosong)',
+            'Unit' => $data['unit'] ?? '(Kosong)'
+        ]);
+
+        $approval = $this->generateIdentity([
+            'Nama Atasan' => $approvalData['nama_atasan'] ?? '(Kosong)',
+            'NIK Atasan' => $approvalData['nik_atasan'] ?? '(Kosong)'
+        ]);
+
         $ticket = $data['perihal'] ?? '(Kosong)';
         $reason = $data['alasan'] ?? '(Kosong)';
-        $nama = $data['nama'] ?? '(Kosong)';
-        $nik = $data['nik'] ?? '(Kosong)';
-        $unit = $data['unit'] ?? '(Kosong)';
 
-        $namaAtasan = $approvalData['nama_atasan'] ?? '(Kosong)';
-        $nikAtasan = $approvalData['nik_atasan'] ?? '(Kosong)';
+        return <<<REPLY
+            Command: $command
+            Action: $action
 
-        $requesterIdentity = <<<IDENTITY
-            Nama: $nama
-            NIK: $nik
-            Unit: $unit
-            IDENTITY;
+            Requester Identity:
+            $requester
 
-        $approvalIdentity = <<<IDENTITY
-            Nama Atasan: $namaAtasan
-            NIK Atasan: $nikAtasan
-            IDENTITY;
+            Ticket: $ticket
+            Reason: $reason
 
-        $replyMessage = "Command: $command\n";
-        $replyMessage .= "Action: $action\n";
-        $replyMessage .= "Requester Identity:\n";
-        $replyMessage .= $requesterIdentity . "\n";
-        $replyMessage .= "\nTicket: " . $ticket . "\n";
-        $replyMessage .= "Reason: " . $reason . "\n";
-        $replyMessage .= "\nApproval Identity:\n";
-        $replyMessage .= $approvalIdentity . "\n";
-        $replyMessage .= "\nRaw Data (antara tanda #):\n" . $rawData;
+            Approval Identity:
+            $approval
 
-        $this->replyMessage($chatId, $messageId, $replyMessage);
+            Raw Data (antara tanda #):
+            $rawData
+            REPLY;
     }
 
-
-    /**
-     * @param $chatId
-     * @param $messageId
-     * @param $replyMessage
-     * @return Message
-     */
-    public function replyMessage($chatId, $messageId, $replyMessage): Message
+    private function generateIdentity(array $fields): string
     {
-        try {
-            return Telegram::sendMessage([
-                'chat_id' => $chatId,
-                'text' => $replyMessage,
-                'reply_to_message_id' => $messageId,
-                'parse_mode' => 'HTML',
-            ]);
-        } catch (\Exception $e) {
-            return Telegram::sendMessage([
-                'chat_id' => $chatId,
-                'text' => $e->getMessage(),
-                'reply_to_message_id' => $messageId,
-                'parse_mode' => 'HTML',
-            ]);
-        }
+        return implode("\n", array_map(fn($key, $value) => "$key: $value", array_keys($fields), $fields));
     }
 
-
-    /**
-     * @param $key
-     * @return string
-     */
-    public function formatKeyValue($key): string
+    private function sendReply($chatId, $messageId, $text): void
     {
-        $key = preg_replace('/^\s+|\s+$|\s+(?=\s)/', '', $key);
-
-        $key = str_replace(' ', '_', $key);
-
-        return strtolower($key);
+        Telegram::sendMessage([
+            'chat_id' => $chatId,
+            'text' => $text,
+            'reply_to_message_id' => $messageId,
+            'parse_mode' => 'HTML',
+        ]);
     }
 
+    private function formatKey(string $key): string
+    {
+        return strtolower(preg_replace('/\s+/', '_', trim($key)));
+    }
 }
-
