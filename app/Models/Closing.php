@@ -15,7 +15,7 @@ class Closing extends Model
 
     protected $fillable = [
         'ticket_id',
-        'group_name',
+        'channel',
         'requester_identity',
         'approval_identity',
         'category',
@@ -25,6 +25,7 @@ class Closing extends Model
         'reason',
         'status',
         'solver',
+        'solver_id',
         'action',
         'duration',
         'created_at',

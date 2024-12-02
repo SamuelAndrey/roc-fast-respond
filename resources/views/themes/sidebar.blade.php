@@ -4,16 +4,23 @@
     <ul class="sidebar-nav" id="sidebar-nav">
 
         <li class="nav-item">
-            <a class="nav-link " href="index.html">
+            <a class="nav-link collapsed" href="index.html">
                 <i class="bi bi-grid"></i>
                 <span>Dashboard</span>
             </a>
         </li><!-- End Dashboard Nav -->
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="/moban/closings">
-                <i class="bi bi-grid"></i>
+            <a class="nav-link {{ request()->routeIs('closing') ? '' : 'collapsed' }}" href="{{ route('closing') }}">
+                <i class="bi bi-box-arrow-left"></i>
                 <span>Closing</span>
+            </a>
+        </li><!-- End Closing Nav -->
+
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="/moban/closing">
+                <i class="bi bi-link"></i>
+                <span>Unbind</span>
             </a>
         </li><!-- End Dashboard Nav -->
 

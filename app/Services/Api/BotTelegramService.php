@@ -138,7 +138,7 @@ class BotTelegramService
 
                 ~ Tercatat ~
                 Kategori :  {$params['action_category']}
-                No.Tiket :  $closing->ticket_id}
+                No.Tiket :  $closing->ticket_id
                 RESP;
     }
 
@@ -161,7 +161,7 @@ class BotTelegramService
             'witel' => $params['data']['unit'] ?? '(Kosong)',
             'message' => $params['raw_data'],
             'category' => $params['action'],
-            'group_name' => $this->chatTitle,
+            'channel' => $this->chatTitle,
         ];
     }
 

@@ -16,18 +16,26 @@ return new class extends Migration
             $table->string('ticket_id')->unique()->nullable();
             $table->bigInteger('chat_id')->nullable();
             $table->bigInteger('message_id')->nullable();
-            $table->string('group_name')->nullable();
+
+            $table->string('channel')->nullable();
+
             $table->text('requester_identity')->nullable();
             $table->text('approval_identity')->nullable();
+
             $table->text('message')->nullable();
             $table->string('category')->nullable();
             $table->string('ticket')->nullable();
             $table->string('witel')->nullable();
             $table->string('reason')->nullable();
+
             $table->tinyInteger('status')->nullable(false)->default(0);
+
             $table->string('solver')->nullable();
+            $table->unsignedBigInteger('solver_id')->nullable();
+
             $table->text('action')->nullable();
             $table->integer('duration')->nullable();
+
             $table->timestamps();
             $table->timestamp('solved_at')->nullable();
         });
