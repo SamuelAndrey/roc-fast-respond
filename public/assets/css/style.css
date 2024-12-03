@@ -1250,7 +1250,6 @@ table {
 
 .pagination .page-link {
     background-color: #F4F4F4;
-    border-color: #E60012;
     color: #E60012;
 }
 
@@ -1262,7 +1261,6 @@ table {
 .pagination .page-item.disabled .page-link {
     background-color: #F4F4F4;
     color: #B0B0B0;
-    border-color: #F4F4F4;
 }
 
 /*--------------------------------------------------------------
@@ -1273,3 +1271,8 @@ table.dataTable {
     overflow: hidden;
 }
 
+/* Kelas untuk menonaktifkan nowrap */
+.no-wrap-disable {
+    white-space: normal !important;
+    text-align: center;
+}

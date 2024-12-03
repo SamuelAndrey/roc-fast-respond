@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-@include('pages.admin.user.components.head', ['title' => 'Closing'])
+@include('themes.head.head-min', ['title' => 'Closing'])
 
 <body>
 
@@ -26,12 +26,14 @@
             <div class="col-lg-12">
 
                 <div class="card">
-                    <div class="card-body py-5">
+                    <div class="card-body">
+
+                        <h5 class="card-title">Recent Closure</h5>
 
                         @include('alerts.error')
                         @include('alerts.success')
-                            <!-- Table -->
-                        <table id="user-table" class="table responsive table-striped nowrap" style="width:100%" >
+                        <!-- Table -->
+                        <table id="closing-table" class="table responsive table-striped nowrap" style="width:100%">
                             <thead class="table-secondary">
                             <tr>
                                 <th>Ticket ID</th>
@@ -39,11 +41,9 @@
                                 <th>Message</th>
                                 <th>Reason</th>
                                 <th>Ticket</th>
-
                                 <th>Status</th>
-                                <th>Pickup By</th>
+                                <th class="no-wrap-disable">Pickup By</th>
                                 <th>Created</th>
-
                                 <th>Channel</th>
                                 <th>Witel</th>
                                 <th>Requester</th>
@@ -55,7 +55,6 @@
                             <tbody>
                             @foreach($closings as $closing)
                                 <tr>
-
                                     <td>{{ $closing->ticket_id }}</td>
                                     <td class="fw-bolder text-danger">{{ strtoupper($closing->category) }}</td>
                                     <td>
@@ -67,20 +66,25 @@
                                     <td>
                                         <pre class="pre-table">{{ $closing->ticket }}</pre>
                                     </td>
-
                                     <td>
-                                        @if($closing->solver == 0)
-                                            <span class="btn btn-sm btn-danger rounded-0 shadow-sm"><i class="bi bi-hourglass"></i> Awaiting</span>
-                                        @elseif($closing->solver == 1)
-                                            <span class="btn btn-sm btn-info rounded-0 shadow-sm"><i class="bi bi-hourglass"></i> OGP</span>
-                                        @elseif($closing->solver == 3)
-                                            <span class="btn btn-sm btn-success rounded-0 shadow-sm"><i class="bi bi-hourglass"></i> Done</span>
+                                        @if($closing->status == 0)
+                                            <span class="btn btn-sm btn-danger rounded-0"><i
+                                                    class="bi bi-hourglass"></i> Awaiting</span>
+                                        @elseif($closing->status == 1)
+                                            <span class="btn btn-sm btn-warning rounded-0"><i
+                                                    class="bi bi-arrow-repeat"></i> OGP</span>
+                                        @elseif($closing->status == 2)
+                                            <span class="btn btn-sm btn-success rounded-0"><i
+                                                    class="bi bi-check-all"></i> Done</span>
                                         @endif
                                     </td>
-
-                                    <td>
+                                    <td class="no-wrap-disable">
                                         @if(empty($closing->solver))
-                                            <span class="btn btn-sm btn-success rounded-0 fw-bolder shadow-sm" style="cursor: pointer;">
+                                            <span
+                                                class="btn btn-sm btn-success rounded-0 fw-bolder shadow-sm pickup-request"
+                                                style="cursor: pointer;"
+                                                data-ticket="{{ $closing->ticket_id }}"
+                                                data-id="{{ $closing->id }}">
                                                 <i class="bi bi-box-arrow-in-right"></i> Take
                                             </span>
                                         @else
@@ -98,12 +102,11 @@
                                     </td>
                                     <td>{{ $closing->solved_at }}</td>
                                     <td>{{ $closing->duration }}</td>
-
                                 </tr>
                             @endforeach
-
                             </tbody>
                         </table>
+
                         <!-- End Table -->
 
 
@@ -116,11 +119,11 @@
 
 </main><!-- End #main -->
 
-@include('pages.admin.user.components.modal', ['role' => 'admin'])
+@include('pages.moban.closing.components.modal', ['role' => 'admin'])
 
 @include('themes.footer')
 
-@include('pages.admin.user.components.script')
+@include('pages.moban.closing.components.script')
 
 </body>
 </html>

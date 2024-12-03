@@ -131,16 +131,28 @@ class BotTelegramService
     private function processToDatabase(array $params): string
     {
         $data = $this->generateRequest($params);
-        $closing = Closing::query()->create($data);
+        // CEK JIKA REQUEST SUDAH SELESAI / DI TOLAK
+        $closing = Closing::updateOrCreate(
+            [
+                'chat_id' => $this->chatId,
+                'message_id' => $this->messageId,
+            ],
+            $data
+        );
+
+        $message = $closing->wasRecentlyCreated
+            ? "Permintaan closing berhasil terkirim."
+            : "Pesan berhasil diperbarui.";
 
         return <<<RESP
-                Permintaan closing berhasil di proses.
+            $message
 
-                ~ Tercatat ~
-                Kategori :  {$params['action_category']}
-                No.Tiket :  $closing->ticket_id
-                RESP;
+            ~ Tercatat ~
+            Kategori :  {$params['action_category']}
+            No.Tiket :  $closing->ticket_id
+            RESP;
     }
+
 
     private function generateRequest(array $params): array
     {
