@@ -23,7 +23,9 @@ class BotTelegramService
         $this->chatId = $updates->getChat()->getId();
         $this->messageId = $updates->getMessage()->getMessageId();
         $this->message = $updates->getMessage()->getText();
-        $this->chatTitle = $updates->getChat()->getTitle();
+        $this->chatTitle = $updates->getChat()->getTitle()
+            ?? $updates->getMessage()->getFrom()->getUsername()
+            ?? '(Kosong)';
 
         if (str_starts_with($this->message, '/moban')) {
             $this->handlePrompt();

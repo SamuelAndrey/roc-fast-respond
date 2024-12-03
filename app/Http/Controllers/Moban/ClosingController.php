@@ -40,6 +40,21 @@ class ClosingController extends Controller
         } catch (\Exception $e) {
             return back()->withErrors(['error' => $e->getMessage()]);
         }
+    }
 
+    public function close(Request $request): RedirectResponse
+    {
+        try {
+            $data = $request->validate([
+                'closing_id' => 'required|int',
+                'action' => ''
+            ]);
+
+            $this->closingService->close($data);
+
+            return back()->with('success', 'Request pickup successfully.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => $e->getMessage()]);
+        }
     }
 }

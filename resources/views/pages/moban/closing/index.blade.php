@@ -42,7 +42,7 @@
                                 <th>Reason</th>
                                 <th>Ticket</th>
                                 <th>Status</th>
-                                <th class="no-wrap-disable">Pickup By</th>
+                                <th class="text-center">Pickup by</th>
                                 <th>Created</th>
                                 <th>Channel</th>
                                 <th>Witel</th>
@@ -54,7 +54,6 @@
                             </thead>
                             <tbody>
                             @php
-                                $number = 1;
                                 $userId = auth()->user()->id;
                             @endphp
                             @foreach($closings as $index => $closing)
@@ -85,34 +84,35 @@
                                                     class="bi bi-check-all"></i> Done</span>
                                         @endif
                                     </td>
-                                    <td>
+                                    <td class="text-center">
                                         @if(empty($closing->solver))
-                                            <span
+                                            <button
                                                 class="btn btn-sm btn-success rounded-0 fw-bolder shadow-sm pickup-request"
                                                 style="cursor: pointer;"
                                                 data-ticket="{{ $closing->ticket_id }}"
                                                 data-id="{{ $closing->id }}">
                                                 <i class="bi bi-box-arrow-in-right"></i> Take
-                                            </span>
+                                            </button>
                                         @else
                                             @if($userId == $closing->solver_id && $closing->status != 2)
-                                                <span
-                                                    class="btn btn-sm btn-danger rounded-0 fw-bolder shadow-sm pickup-request"
+                                                <button
+                                                    class="btn btn-sm btn-danger rounded-0 fw-bolder shadow-sm action-request"
                                                     style="cursor: pointer;"
+                                                    data-id="{{ $closing->id }}"
                                                     data-ticket="{{ $closing->ticket_id }}"
-                                                    data-id="{{ $closing->id }}">
+                                                    data-message="{{ $closing->message }}"
+                                                    data-created="{{ $closing->created_at }}">
                                                     <i class="bi bi-arrow-right-circle-fill"></i> Action
-                                                </span><br>
-                                                <p class="no-wrap-disable mt-2 text-muted">
+                                                </button>
+                                                <br>
+                                                <p class="mt-2 text-muted no-wrap-disable">
                                                     You Picked this Request
                                                 </p>
-
                                             @else
-                                                <p class="no-wrap-disable text-muted">
+                                                <p class="text-muted no-wrap-disable">
                                                     {{ strtoupper($closing->solver) }}
                                                 </p>
                                             @endif
-
                                         @endif
                                     </td>
 

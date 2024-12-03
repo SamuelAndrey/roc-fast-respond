@@ -23,5 +23,22 @@
 
             $('#pickupModal').modal('show');
         });
+
+        // Action closing modal
+        $(document).on('click', '.action-request', function (e) {
+            e.preventDefault();
+
+            const id = $(this).data('id');
+            const ticket = $(this).data('ticket');
+            const message = $(this).data('message');
+            const created = $(this).data('created');
+
+            $('#action-id').val(id);
+            $('#action-ticket').text(ticket);
+            $('#action-message').text(message);
+            $('#action-created').text(created);
+
+            $('#actionModal').modal('show');
+        });
     });
 </script>
