@@ -1249,18 +1249,12 @@ table {
 }
 
 .pagination .page-link {
-    background-color: #F4F4F4;
     color: #E60012;
 }
 
 .pagination .page-link:hover {
     background-color: #E60012;
     color: #FFFFFF;
-}
-
-.pagination .page-item.disabled .page-link {
-    background-color: #F4F4F4;
-    color: #B0B0B0;
 }
 
 /*--------------------------------------------------------------
@@ -1274,5 +1268,4 @@ table.dataTable {
 /* Kelas untuk menonaktifkan nowrap */
 .no-wrap-disable {
     white-space: normal !important;
-    text-align: center;
 }

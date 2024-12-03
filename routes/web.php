@@ -46,7 +46,8 @@ Route::group(['prefix' => 'auth'], function () {
 Route::group(['prefix' => 'moban', 'middleware' => ['auth']], function () {
     Route::group(['prefix' => 'closing'], function () {
         Route::get('/', [ClosingController::class, 'index'])->name('closing');
-        Route::put('/', [ClosingController::class, 'index'])->name('closing.pickup');
+        Route::put('/pickup', [ClosingController::class, 'pickup'])->name('closing.pickup');
+        Route::put('/close', [ClosingController::class, 'pickup'])->name('closing.close');
     });
 });
 

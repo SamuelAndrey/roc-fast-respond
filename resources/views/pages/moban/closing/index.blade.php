@@ -33,7 +33,7 @@
                         @include('alerts.error')
                         @include('alerts.success')
                         <!-- Table -->
-                        <table id="closing-table" class="table responsive table-striped nowrap" style="width:100%">
+                        <table id="closing-table" class="table w-100 responsive table-striped nowrap" style="width:100%">
                             <thead class="table-secondary">
                             <tr>
                                 <th>Ticket ID</th>
@@ -53,15 +53,22 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach($closings as $closing)
+                            @php
+                                $number = 1;
+                                $userId = auth()->user()->id;
+                            @endphp
+                            @foreach($closings as $index => $closing)
                                 <tr>
-                                    <td>{{ $closing->ticket_id }}</td>
+                                    <td>
+                                        {{ $closing->ticket_id }} <br>
+                                        <h6 class="fw-bold text-primary">#{{ ($closings->firstItem() + $index) }}</h6>
+                                    </td>
                                     <td class="fw-bolder text-danger">{{ strtoupper($closing->category) }}</td>
                                     <td>
-                                        <pre class="pre-table form-control">{{ $closing->message }}</pre>
+                                        <pre class="pre-table form-control" style="width: 250px">{{ $closing->message }}</pre>
                                     </td>
                                     <td>
-                                        <pre class="pre-table">{{ $closing->reason }}</pre>
+                                        <pre class="pre-table no-wrap-disable" style="width: 150px">{{ $closing->reason }}</pre>
                                     </td>
                                     <td>
                                         <pre class="pre-table">{{ $closing->ticket }}</pre>
@@ -78,7 +85,7 @@
                                                     class="bi bi-check-all"></i> Done</span>
                                         @endif
                                     </td>
-                                    <td class="no-wrap-disable">
+                                    <td>
                                         @if(empty($closing->solver))
                                             <span
                                                 class="btn btn-sm btn-success rounded-0 fw-bolder shadow-sm pickup-request"
@@ -88,9 +95,27 @@
                                                 <i class="bi bi-box-arrow-in-right"></i> Take
                                             </span>
                                         @else
-                                            {{ strtoupper($closing->solver) }}
+                                            @if($userId == $closing->solver_id && $closing->status != 2)
+                                                <span
+                                                    class="btn btn-sm btn-danger rounded-0 fw-bolder shadow-sm pickup-request"
+                                                    style="cursor: pointer;"
+                                                    data-ticket="{{ $closing->ticket_id }}"
+                                                    data-id="{{ $closing->id }}">
+                                                    <i class="bi bi-arrow-right-circle-fill"></i> Action
+                                                </span><br>
+                                                <p class="no-wrap-disable mt-2 text-muted">
+                                                    You Picked this Request
+                                                </p>
+
+                                            @else
+                                                <p class="no-wrap-disable text-muted">
+                                                    {{ strtoupper($closing->solver) }}
+                                                </p>
+                                            @endif
+
                                         @endif
                                     </td>
+
                                     <td>{{ $closing->created_at }}</td>
                                     <td>{{ $closing->channel }}</td>
                                     <td>{{ $closing->witel }}</td>
@@ -106,10 +131,8 @@
                             @endforeach
                             </tbody>
                         </table>
-
+                        {{ $closings->links() }}
                         <!-- End Table -->
-
-
                     </div>
                 </div>
 
@@ -119,7 +142,7 @@
 
 </main><!-- End #main -->
 
-@include('pages.moban.closing.components.modal', ['role' => 'admin'])
+@include('pages.moban.closing.components.modal')
 
 @include('themes.footer')
 
